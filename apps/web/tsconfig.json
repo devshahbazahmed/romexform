@@ -1,8 +1,7 @@
 {
   "extends": "@repo/typescript-config/nextjs.json",
   "compilerOptions": {
-    // "baseUrl": ".",
-    "moduleResolution": "Bundler",
+    "baseUrl": ".",
     "paths": {
       "~/*": ["./*"]
     },
@@ -17,8 +16,7 @@
     "**/*.tsx",
     "next-env.d.ts",
     "next.config.js",
-    ".next/types/**/*.ts",
-    "env.js"
+    ".next/types/**/*.ts"
   ],
   "exclude": ["node_modules"]
 }

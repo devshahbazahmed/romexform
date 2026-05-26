@@ -2,7 +2,7 @@ import { defineConfig } from "tsup";
 
 export default defineConfig({
   entry: ["./src/index.ts"],
-  noExternal: ["@romexform"],
+  noExternal: ["@romexform"], // transpile packages starting with `@romexform` and their dependencies
   splitting: false,
   bundle: true,
   outDir: "./dist",

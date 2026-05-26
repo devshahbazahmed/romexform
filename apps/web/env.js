@@ -1,6 +1,5 @@
 import { createEnv } from "@t3-oss/env-nextjs";
 import { z } from "zod";
-// import { process } from "zod/v4/core";
 
 export const env = createEnv({
   /**
@@ -22,15 +21,13 @@ export const env = createEnv({
    * You can't destruct `process.env` as a regular object in the Next.js edge runtimes (e.g.
    * middlewares) or client-side so we need to destruct manually.
    */
-  experimental__runtimeEnv: {
-    // @ts-ignore
+  runtimeEnv: {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
    * useful for Docker builds.
    */
-  // @ts-ignore
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
   /**
    * Makes it so that empty strings are treated as undefined. `SOME_VAR: z.string()` and
