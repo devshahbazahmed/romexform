@@ -8,6 +8,20 @@
       "when": 1779818298752,
       "tag": "0000_silent_katie_power",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1779858971927,
+      "tag": "0001_organic_firelord",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1779859263878,
+      "tag": "0002_damp_microchip",
+      "breakpoints": true
     }
   ]
 }
