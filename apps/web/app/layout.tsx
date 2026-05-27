@@ -27,9 +27,11 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <Header />
-        <GlobalProviders>{children}</GlobalProviders>
-        <Footer />
+        <GlobalProviders>
+          <Header />
+          {children}
+          <Footer />
+        </GlobalProviders>
       </body>
     </html>
   );

@@ -5,10 +5,7 @@ import Link from "next/link";
 import { ArrowRight, CheckCircle2, BarChart3, LayoutTemplate, Sparkles } from "lucide-react";
 import FooterColumn from "~/components/FooterColumn";
 import { FeatureCard } from "~/components/FeatureCard";
-
-// const companies = ["Velocis", "Aether", "Luminary", "Stratos", "CloudBase"];
-
-const themes = ["Cyberpunk", "Studio Ghibli", "IMAX Dark", "Silicon Valley"];
+import Image from "next/image";
 
 const fadeUp = {
   initial: { opacity: 0, y: 28 },
@@ -60,23 +57,6 @@ export default function HomePage() {
         </motion.div>
       </section>
 
-      {/* logos */}
-      {/* <section className="mx-auto max-w-6xl px-6 pb-20">
-        <motion.div {...fadeUp} transition={{ duration: 0.6 }} className="text-center">
-          <p className="mb-6 text-xs tracking-[0.25em] uppercase text-slate-500">
-            Helping high-growth teams win
-          </p>
-
-          <div className="flex flex-wrap items-center justify-center gap-10 text-slate-500">
-            {companies.map((company) => (
-              <span key={company}>{company}</span>
-            ))}
-          </div>
-
-          <p className="mt-8 text-3xl font-semibold text-[#b8b4ff]">500+ startups and counting.</p>
-        </motion.div>
-      </section> */}
-
       {/* features */}
       <section className="mx-auto max-w-7xl px-6 pb-28 md:px-10">
         <motion.div {...fadeUp} className="text-center mb-14">
@@ -99,25 +79,6 @@ export default function HomePage() {
             title="Real-time Analytics"
             description="Monitor completion rates and drop-off points as they happen with live telemetry."
           />
-
-          <div className="lg:col-span-2">
-            <FeatureCard
-              icon={<Sparkles size={20} />}
-              title="Creative Themes"
-              description="Go beyond basic CSS with cinematic transitions and sophisticated visual shaders."
-            >
-              <div className="mt-8 flex flex-wrap gap-3">
-                {themes.map((theme) => (
-                  <span
-                    key={theme}
-                    className="rounded-full border border-white/10 px-4 py-2 text-xs text-slate-300"
-                  >
-                    {theme}
-                  </span>
-                ))}
-              </div>
-            </FeatureCard>
-          </div>
         </div>
       </section>
 
@@ -145,10 +106,7 @@ export default function HomePage() {
           </div>
         </motion.div>
 
-        <motion.div
-          {...fadeUp}
-          className="rounded-3xl border border-white/10 bg-white/[0.02] min-h-[320px] backdrop-blur-sm"
-        />
+        <Image src={"/focus.png"} alt="focus" width={900} height={600} />
       </section>
 
       {/* cta */}

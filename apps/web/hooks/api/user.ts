@@ -51,3 +51,13 @@ export function useSignin() {
     status,
   };
 }
+
+export function useCurrentUser() {
+  const { data, isLoading, error } = trpc.auth.getLoggedInUserInfo.useQuery();
+
+  return {
+    user: data,
+    isLoading,
+    error,
+  };
+}
