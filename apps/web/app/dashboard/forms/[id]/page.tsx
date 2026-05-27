@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, type FormEvent } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import {
   Plus,
   Type,
@@ -99,6 +99,7 @@ function SortableFieldCard({
 export default function FormBuilder() {
   const params = useParams();
   const formId = params?.id as string | undefined;
+  const router = useRouter();
 
   const [orderedFields, setOrderedFields] = useState<typeof fields>([]);
   const [open, setOpen] = useState(false);
@@ -172,13 +173,6 @@ export default function FormBuilder() {
 
       return arrayMove(items, oldIndex, newIndex);
     });
-
-    /**
-   Optional:
-   Persist ordering to DB here.
-   Example:
-   await updateFieldOrderMutation(...)
-   */
   };
   return (
     <main className="min-h-screen bg-[#050816] text-[#E6E8F0]">
@@ -337,6 +331,9 @@ export default function FormBuilder() {
               )}
             </div>
           </div>
+          <Button className="flex cursor-pointer hover:bg-blue-800 bg-blue-600 text-white active:scale-95 hover:scale-110 mt-10 ml-2" onClick={() => router.push(`/form/${formId}`)}>
+            Submit Form
+          </Button>
         </section>
 
         {/* RIGHT PANEL */}
