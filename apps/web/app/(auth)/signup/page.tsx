@@ -129,7 +129,7 @@ export default function SignupPage() {
             whileHover={{ scale: 1.015 }}
             whileTap={{ scale: 0.985 }}
             type="submit"
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-[#5c4cf7] font-medium text-white shadow-lg shadow-[#5c4cf7]/30 transition hover:bg-[#695cff] hover:cursor-pointer"
+            className="flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-blue-600 font-medium text-white shadow-lg shadow-[#5c4cf7]/30 transition hover:bg-blue-800 hover:cursor-pointer"
           >
             {isPending ? "Creating Account..." : "Create Account"}
             <ArrowRight size={18} />

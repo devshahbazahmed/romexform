@@ -1,218 +1,371 @@
 "use client";
 
-import * as React from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect, type FormEvent } from "react";
+import { useParams } from "next/navigation";
 import {
   Plus,
   Type,
+  Hash,
   Mail,
-  Calendar,
-  Upload,
-  Moon,
-  Copy,
-  Trash2,
+  Lock,
+  CheckSquare,
   GripVertical,
-  Circle,
+  Calendar,
+  List,
+  Star,
 } from "lucide-react";
+
+import { useCreateField, useGetFields } from "~/hooks/api/form-field";
+
 import { Button } from "~/components/ui/button";
-import FormSidebarItem from "~/components/FormSidebarItem";
-import ThemeCard from "~/components/ThemeCard";
-import StepperButton from "~/components/StepperButton";
-import FormSettingPanel from "~/components/FormSettingPanel";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "~/components/ui/dialog";
+import { Input } from "~/components/ui/input";
+import { Textarea } from "~/components/ui/textarea";
+import { Checkbox } from "~/components/ui/checkbox";
 
-export default function FormBuilderPage() {
-  const [title, setTitle] = React.useState("Anime Poll 2024");
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
 
-  const [description, setDescription] = React.useState(
-    "Help us determine the most anticipated series and characters of the upcoming seasonal cycle.",
-  );
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  useSortable,
+  arrayMove,
+} from "@dnd-kit/sortable";
 
-  const [options, setOptions] = React.useState([
-    "One Piece - Egghead Island Arc",
-    "Bleach - Thousand-Year Blood War",
-    "Naruto - Boruto: Two Blue Vortex",
-  ]);
+import { CSS } from "@dnd-kit/utilities";
 
-  const addOption = () => {
-    setOptions([...options, ""]);
+function SortableFieldCard({
+  field,
+}: {
+  field: {
+    id: string;
+    label: string;
+    description?: string | null;
+    placeholder?: string | null;
+    type: string;
+  };
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: field.id,
+  });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
   };
 
   return (
-    <main className="min-h-screen bg-[#020817] text-white overflow-hidden">
-      <div className="grid min-h-screen grid-cols-12">
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`flex items-center gap-4 rounded-xl border border-white/5 bg-[#101733] p-5 transition ${
+        isDragging ? "opacity-60 shadow-2xl" : ""
+      }`}
+    >
+      <button {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing">
+        <GripVertical className="h-4 w-4 text-white/20" />
+      </button>
+
+      <div className="flex-1">
+        <p className="font-medium text-white">{field.label}</p>
+
+        {(field.description || field.placeholder) && (
+          <p className="mt-1 text-sm text-white/40">{field.description || field.placeholder}</p>
+        )}
+      </div>
+
+      <span className="rounded-md bg-white/5 px-3 py-1 text-xs uppercase tracking-wide text-[#B6BCFF]">
+        {field.type}
+      </span>
+    </div>
+  );
+}
+
+export default function FormBuilder() {
+  const params = useParams();
+  const formId = params?.id as string | undefined;
+
+  const [orderedFields, setOrderedFields] = useState<typeof fields>([]);
+  const [open, setOpen] = useState(false);
+  const [label, setLabel] = useState("");
+  const [type, setType] = useState<
+    "TEXT" | "NUMBER" | "EMAIL" | "YES_NO" | "PASSWORD" | "SELECT" | "DATE" | "RATING"
+  >("TEXT");
+  const [description, setDescription] = useState("");
+  const [placeholder, setPlaceholder] = useState("");
+  const [isRequired, setIsRequired] = useState(false);
+
+  const { createFieldAsync, status, error } = useCreateField(formId ?? "");
+  const { fields, isLoading: fieldsLoading } = useGetFields(formId ?? "");
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!formId) return;
+
+    await createFieldAsync({
+      label: label.trim(),
+      type,
+      formId,
+      description: description.trim() || undefined,
+      placeholder: placeholder.trim() || undefined,
+      isRequired,
+    });
+
+    setOpen(false);
+    setLabel("");
+    setType("TEXT");
+    setDescription("");
+    setPlaceholder("");
+    setIsRequired(false);
+  };
+
+  const fieldTypes = [
+    { icon: Type, label: "Text", value: "TEXT" },
+    { icon: Hash, label: "Number", value: "NUMBER" },
+    { icon: Mail, label: "Email", value: "EMAIL" },
+    { icon: CheckSquare, label: "Yes / No", value: "YES_NO" },
+    { icon: Lock, label: "Password", value: "PASSWORD" },
+    { icon: List, label: "Select", value: "SELECT" },
+    { icon: Calendar, label: "Date", value: "DATE" },
+    { icon: Star, label: "Rating", value: "RATING" },
+  ];
+
+  useEffect(() => {
+    if (fields) {
+      setOrderedFields(fields);
+    }
+  }, [fields]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (!over || active.id === over.id) return;
+
+    setOrderedFields((items) => {
+      if (!items) return [];
+
+      const oldIndex = items.findIndex((i) => i.id === active.id);
+      const newIndex = items.findIndex((i) => i.id === over.id);
+
+      return arrayMove(items, oldIndex, newIndex);
+    });
+
+    /**
+   Optional:
+   Persist ordering to DB here.
+   Example:
+   await updateFieldOrderMutation(...)
+   */
+  };
+  return (
+    <main className="min-h-screen bg-[#050816] text-[#E6E8F0]">
+      <div className="grid min-h-screen grid-cols-[260px_1fr_320px]">
         {/* LEFT SIDEBAR */}
-        <aside className="col-span-2 border-r border-white/10 bg-[#030b1d] px-6 py-8 hidden lg:block">
-          <h2 className="text-3xl font-semibold text-[#b8b4ff]">Romex Admin</h2>
+        <aside className="border-r border-white/5 bg-[#070b1d] p-6">
+          <div className="mb-10">
+            <h2 className="text-2xl font-semibold tracking-tight text-[#C7C9FF]">RomexForms</h2>
+            <p className="mt-1 text-sm text-white/40">Enterprise Suite</p>
+          </div>
 
-          <p className="mt-2 text-sm text-slate-500">Enterprise Suite</p>
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button className="mb-8 w-full bg-blue-600 text-white hover:bg-blue-800 cursor-pointer active:scale-95 hover:scale-110">
+                <Plus className="mr-2 h-4 w-4" />
+                Create Field
+              </Button>
+            </DialogTrigger>
 
-          <Button className="mt-8 w-full bg-[#c4bbff] text-black hover:bg-[#d4ceff]">
-            <Plus className="mr-2 h-4 w-4" />
-            Create New Form
-          </Button>
+            <DialogContent className="border-white/10 bg-[#0A1024] text-white">
+              <DialogHeader>
+                <DialogTitle>Create Field</DialogTitle>
+                <DialogDescription className="text-white/50">
+                  Add a field to your form
+                </DialogDescription>
+              </DialogHeader>
 
-          <div className="mt-12">
-            <p className="mb-5 text-xs tracking-[0.18em] uppercase text-slate-500">Basic Fields</p>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <Input
+                  placeholder="Field label"
+                  value={label}
+                  onChange={(e) => setLabel(e.target.value)}
+                  className="border-white/10 bg-white/5"
+                />
 
-            <div className="space-y-2">
-              <FormSidebarItem icon={<Type size={18} />} label="Short Text" />
-              <FormSidebarItem active icon={<Circle size={18} />} label="Multiple Choice" />
-              <FormSidebarItem icon={<Mail size={18} />} label="Email" />
-              <FormSidebarItem icon={<Calendar size={18} />} label="Date Picker" />
-              <FormSidebarItem icon={<Upload size={18} />} label="File Upload" />
-            </div>
+                <select
+                  value={type}
+                  onChange={(e) =>
+                    setType(
+                      e.target.value as
+                        | "TEXT"
+                        | "NUMBER"
+                        | "EMAIL"
+                        | "YES_NO"
+                        | "PASSWORD"
+                        | "SELECT"
+                        | "DATE"
+                        | "RATING",
+                    )
+                  }
+                  className="w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm"
+                >
+                  {fieldTypes.map((t) => (
+                    <option key={t.value} value={t.value}>
+                      {t.label}
+                    </option>
+                  ))}
+                </select>
+
+                <Textarea
+                  placeholder="Description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  className="border-white/10 bg-white/5"
+                />
+
+                <Input
+                  placeholder="Placeholder"
+                  value={placeholder}
+                  onChange={(e) => setPlaceholder(e.target.value)}
+                  className="border-white/10 bg-white/5"
+                />
+
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    checked={isRequired}
+                    onCheckedChange={(v) => setIsRequired(Boolean(v))}
+                  />
+                  <span className="text-sm text-white/60">Required</span>
+                </div>
+
+                {error && <p className="text-sm text-red-400">{error.message}</p>}
+
+                <DialogFooter>
+                  <Button
+                    type="submit"
+                    disabled={!label.trim() || status === "pending"}
+                    className="bg-blue-600 text-white hover:bg-blue-800"
+                  >
+                    {status === "pending" ? "Creating..." : "Create"}
+                  </Button>
+                </DialogFooter>
+              </form>
+            </DialogContent>
+          </Dialog>
+
+          <div className="space-y-2">
+            <p className="mb-4 text-xs font-medium uppercase tracking-[0.2em] text-white/30">
+              Basic Fields
+            </p>
+
+            {fieldTypes.map((item) => (
+              <button
+                key={item.value}
+                onClick={() => setType(item.value as any)}
+                className={`flex w-full items-center gap-3 rounded-lg px-4 py-3 text-left transition ${
+                  type === item.value ? "bg-[#131A36] text-white" : "text-white/60 hover:bg-white/5"
+                }`}
+              >
+                <item.icon className="h-4 w-4" />
+                {item.label}
+              </button>
+            ))}
           </div>
         </aside>
 
         {/* CENTER */}
-        <section className="col-span-12 lg:col-span-7 px-8 py-10">
-          <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}>
-            <div className="mx-auto max-w-4xl">
-              <div className="mb-6 inline-flex rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs text-slate-300">
-                LIVE EDITOR
+        <section className="p-10">
+          <div className="mx-auto max-w-3xl">
+            <div className="mb-10 text-center">
+              <div className="mb-4 inline-flex rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs uppercase tracking-widest text-white/50">
+                Live Editor
               </div>
 
-              {/* title + description = your schema */}
-              <input
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="w-full bg-transparent text-center text-6xl font-semibold outline-none"
-              />
+              <h1 className="text-5xl font-semibold tracking-tight text-[#DCE2FF]">Form Builder</h1>
 
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={3}
-                className="mt-6 w-full resize-none bg-transparent text-center text-xl text-slate-400 outline-none"
-              />
-
-              {/* question card */}
-              <div className="mt-12 rounded-3xl border border-white/10 bg-white/[0.02] p-10 backdrop-blur-sm">
-                <div className="flex items-center justify-between">
-                  <span className="rounded-lg border border-white/10 px-4 py-2 text-xs tracking-widest text-slate-400">
-                    #04 MULTIPLE_CHOICE
-                  </span>
-
-                  <div className="flex gap-4 text-slate-400">
-                    <Copy size={18} />
-                    <Trash2 size={18} />
-                  </div>
-                </div>
-
-                <div className="mt-10">
-                  <p className="mb-4 text-sm text-slate-400">Question Title</p>
-
-                  <textarea
-                    defaultValue="Which 'Big Three' series do you think has the best current arc?"
-                    rows={3}
-                    className="w-full rounded-xl border border-white/10 bg-[#020817] p-6 text-3xl font-medium outline-none"
-                  />
-                </div>
-
-                <div className="mt-10">
-                  <p className="mb-6 text-sm text-slate-400">Options</p>
-
-                  <div className="space-y-4">
-                    {options.map((option, index) => (
-                      <div key={index} className="flex items-center gap-4">
-                        <GripVertical className="text-slate-500" size={18} />
-
-                        <div className="flex w-full items-center gap-4 rounded-xl border border-white/10 bg-[#020817] px-5 py-5">
-                          <Circle size={18} className="text-slate-500" />
-
-                          <input
-                            value={option}
-                            onChange={(e) => {
-                              const copy = [...options];
-                              copy[index] = e.target.value;
-                              setOptions(copy);
-                            }}
-                            className="w-full bg-transparent outline-none"
-                          />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <button
-                    onClick={addOption}
-                    className="mt-6 flex items-center gap-2 text-[#b8b4ff] hover:text-white"
-                  >
-                    <Plus size={18} />
-                    Add another option
-                  </button>
-                </div>
-              </div>
+              <p className="mt-4 text-lg text-white/50">
+                Build dynamic forms and collect structured responses.
+              </p>
             </div>
-          </motion.div>
+
+            <div className="rounded-2xl border border-white/10 bg-[#0C1228] p-6 shadow-2xl shadow-black/30">
+              {fieldsLoading ? (
+                <div className="py-12 text-center text-white/40">Loading fields...</div>
+              ) : fields?.length ? (
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd}
+                >
+                  <SortableContext
+                    items={orderedFields?.map((f) => f.id) ?? []}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    <div className="space-y-4">
+                      {orderedFields?.map((field) => (
+                        <SortableFieldCard key={field.id} field={field} />
+                      ))}
+                    </div>
+                  </SortableContext>
+                </DndContext>
+              ) : (
+                <div className="rounded-xl border border-dashed border-white/10 p-16 text-center text-white/40">
+                  No fields yet — click “Create Field” to start building.
+                </div>
+              )}
+            </div>
+          </div>
         </section>
 
-        {/* RIGHT SIDEBAR */}
-        <aside className="hidden lg:block col-span-3 border-l border-white/10 bg-[#030b1d] px-6 py-10">
-          <div className="flex border-b border-white/10 pb-6">
-            <button className="border-b-2 border-[#b8b4ff] pb-2 pr-8 text-lg">Settings</button>
+        {/* RIGHT PANEL */}
+        <aside className="border-l border-white/5 bg-[#070b1d] p-6">
+          <h3 className="mb-6 text-lg font-medium">Settings</h3>
 
-            <button className="pb-2 pl-8 text-slate-500">Theme</button>
-          </div>
+          <div className="space-y-6">
+            <div className="rounded-xl border border-white/5 bg-white/[0.02] p-5">
+              <p className="mb-2 text-sm text-white/50">Field Count</p>
+              <p className="text-3xl font-semibold">{fields?.length ?? 0}</p>
+            </div>
 
-          <div className="mt-10">
-            <h3 className="text-xs uppercase tracking-[0.2em] text-slate-500">Question Settings</h3>
+            <div className="rounded-xl border border-white/5 bg-white/[0.02] p-5">
+              <p className="mb-2 text-sm text-white/50">Current Type</p>
+              <p className="font-medium text-[#B6BCFF]">{type}</p>
+            </div>
 
-            <FormSettingPanel label="Required" enabled />
-            <FormSettingPanel label="Randomize Order" />
-
-            <div className="mt-10">
-              <p className="mb-4 text-sm">Selection Limit</p>
+            <div className="rounded-xl border border-white/5 bg-white/[0.02] p-5">
+              <p className="mb-2 text-sm text-white/50">Theme</p>
 
               <div className="flex gap-3">
-                <StepperButton>-</StepperButton>
-                <StepperButton>1</StepperButton>
-                <StepperButton>+</StepperButton>
+                <div className="h-8 w-8 rounded-full bg-blue-600" />
+                <div className="h-8 w-8 rounded-full bg-[#3B82F6]" />
+                <div className="h-8 w-8 rounded-full bg-[#F59E0B]" />
               </div>
             </div>
-
-            <div className="mt-12">
-              <p className="mb-6 text-sm">Theme Preset</p>
-
-              <div className="grid grid-cols-2 gap-4">
-                <ThemeCard active name="Deep Space" />
-                <ThemeCard name="Paper" />
-              </div>
-            </div>
-
-            <div className="mt-12">
-              <p className="mb-5 text-sm">Accent Color</p>
-
-              <div className="flex gap-3">
-                {["#c9c2ff", "#f7b089", "#8c83ff", "#f5b1b1"].map((color) => (
-                  <button
-                    key={color}
-                    style={{ backgroundColor: color }}
-                    className="h-9 w-9 rounded-full border border-white/10"
-                  />
-                ))}
-              </div>
-            </div>
-
-            <Button className="mt-12 w-full bg-white/10 hover:bg-white/15">
-              Advanced Scripting (JS)
-            </Button>
           </div>
         </aside>
       </div>
-
-      {/* footer */}
-      <footer className="fixed bottom-0 w-full border-t border-white/10 bg-[#020817]/90 backdrop-blur-md px-8 py-4 text-sm text-slate-400">
-        <div className="flex justify-between">
-          <span>© 2026 RomexForms</span>
-
-          <div className="flex gap-8">
-            <span>API Status</span>
-            <span>Privacy Policy</span>
-            <span>Terms</span>
-          </div>
-        </div>
-      </footer>
     </main>
   );
 }
