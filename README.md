@@ -1,135 +1,183 @@
-# Turborepo starter
+# Romexform
 
-This Turborepo starter is maintained by the Turborepo core team.
+A full-stack form builder application built as a Turborepo monorepo, featuring a Next.js frontend, tRPC API, and Drizzle ORM for type-safe database access.
 
-## Using this example
+---
 
-Run the following command:
-
-```sh
-npx create-turbo@latest
-```
-
-## What's inside?
-
-This Turborepo includes the following packages/apps:
-
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
+## Project Structure
 
 ```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
+romexform/
+├── apps/
+│   ├── api/               # Backend API server
+│   └── web/               # Next.js frontend application
+│       └── app/
+│           ├── (auth)/    # Authentication routes
+│           ├── dashboard/forms/  # Forms dashboard
+│           ├── form/[id]/ # Public form view
+│           ├── forms/     # Forms listing
+│           └── pricing/   # Pricing page
+├── packages/
+│   ├── database/          # Drizzle ORM schema, models & migrations
+│   │   ├── drizzle/
+│   │   ├── models/        # form.ts, form-field.ts, form-submission.ts, user.ts
+│   │   └── schema.ts
+│   ├── services/          # Shared business logic
+│   │   ├── form/
+│   │   ├── form-field/
+│   │   ├── form-submission/
+│   │   ├── oauth/
+│   │   └── user/
+│   ├── trpc/              # tRPC server & client setup
+│   │   ├── client/
+│   │   └── server/
+│   │       └── routes/    # auth, form-field, form-submission, health
+│   ├── eslint-config/
+│   └── logger/
 ```
 
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+---
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
+## Tech Stack
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
+| Layer        | Technology                                      |
+| ------------ | ----------------------------------------------- |
+| Frontend     | [Next.js 14+](https://nextjs.org/) (App Router) |
+| API Layer    | [tRPC](https://trpc.io/)                        |
+| Database ORM | [Drizzle ORM](https://orm.drizzle.team/)        |
+| Monorepo     | [Turborepo](https://turbo.build/)               |
+| Language     | TypeScript                                      |
+| Styling      | Tailwind CSS                                    |
+| Auth         | OAuth                                           |
 
-### Develop
+---
 
-To develop all apps and packages, run the following command:
+## Getting Started
 
-```
-cd my-turborepo
+### Prerequisites
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
+- Node.js 18+
+- pnpm (recommended) or npm
+- A supported database (PostgreSQL recommended with Drizzle)
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
+### Installation
 
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+```bash
+# Clone the repository
+git clone https://github.com/your-username/romexform.git
+cd romexform
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
+# Install dependencies
+pnpm install
 ```
 
-### Remote Caching
+### Environment Variables
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+Copy the example env files and fill in your values:
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
+```bash
+cp packages/database/.env.example packages/database/.env
+cp packages/services/.env.example packages/services/.env
 ```
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+Key variables to configure:
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+```env
+# Database
+DATABASE_URL=postgresql://user:password@localhost:5432/romexform
 
+# OAuth
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+
+# App
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
+### Database Setup
+
+```bash
+# Generate migrations
+pnpm db:generate
+
+# Run migrations
+pnpm db:migrate
 ```
 
-## Useful Links
+### Development
 
-Learn more about the power of Turborepo:
+```bash
+# Run all apps in development mode
+pnpm dev
 
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+# Run only the web app
+pnpm dev --filter=web
+
+# Run only the API
+pnpm dev --filter=api
+```
+
+The web app will be available at `http://localhost:3000`.
+
+---
+
+## Key Features
+
+- **Form Builder** — Create and manage custom forms with multiple field types
+- **Form Submissions** — Collect and view responses from submitted forms
+- **Authentication** — OAuth-based user authentication
+- **Dashboard** — Manage all your forms from a central dashboard
+- **Public Form Links** — Share forms via unique URLs (`/form/[id]`)
+- **Pricing** — Tiered plan support
+
+---
+
+## Demo Credentials
+
+Use the following credentials to explore the app without signing up:
+
+| Role  | Email               | Password      |
+| ----- | ------------------- | ------------- |
+| Admin | `shahbaz@gmail.com` | `shahbaz@123` |
+
+> ⚠️ These are for demo/testing purposes only. Do not use these credentials in production.
+
+---
+
+## Available Scripts
+
+| Command            | Description                        |
+| ------------------ | ---------------------------------- |
+| `pnpm dev`         | Start all apps in development mode |
+| `pnpm build`       | Build all apps and packages        |
+| `pnpm lint`        | Lint all packages                  |
+| `pnpm db:generate` | Generate Drizzle migrations        |
+| `pnpm db:migrate`  | Apply pending migrations           |
+| `pnpm db:studio`   | Open Drizzle Studio (DB GUI)       |
+
+---
+
+## Database Models
+
+- **User** — Account information and auth details
+- **Form** — Form metadata (title, settings, theme)
+- **FormField** — Individual fields within a form (type, label, options)
+- **FormSubmission** — Submitted responses linked to a form
+
+---
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feat/your-feature`
+3. Commit your changes: `git commit -m 'feat: add your feature'`
+4. Push to the branch: `git push origin feat/your-feature`
+5. Open a Pull Request
+
+Please follow the existing code style and ensure all TypeScript types are properly defined.
+
+---
+
+## License
+
+MIT © Shahbaz Ahmed Ansari
