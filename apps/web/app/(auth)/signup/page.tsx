@@ -6,10 +6,12 @@ import { Eye, EyeOff, ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useSignup } from "~/hooks/api/user";
+import { useOAuthSignIn } from "~/hooks/api/oauth";
 
 export default function SignupPage() {
   const router = useRouter();
   const { createUserWithEmailAndPasswordAsync, isPending, isSuccess, error } = useSignup();
+  const { signInWithGoogle, signInWithGithub } = useOAuthSignIn();
 
   const [fullName, setFullName] = React.useState("");
   const [email, setEmail] = React.useState("");
@@ -145,6 +147,7 @@ export default function SignupPage() {
         <div className="grid grid-cols-2 gap-4">
           <button
             type="button"
+            onClick={signInWithGoogle}
             className="h-11 rounded-lg border border-white/10 bg-transparent text-sm text-white hover:bg-white/5 transition hover:cursor-pointer active:scale-95 hover:scale-110 flex items-center justify-center gap-2"
           >
             <Image src={"/google.png"} alt="Google" width={20} height={20} />
@@ -153,6 +156,7 @@ export default function SignupPage() {
 
           <button
             type="button"
+            onClick={signInWithGithub}
             className="h-11 rounded-lg border border-white/10 bg-transparent text-sm text-white hover:bg-white/5 transition hover:cursor-pointer active:scale-95 hover:scale-110 flex items-center justify-center gap-2"
           >
             <Image src={"/github.png"} alt="Github" width={20} height={20} />

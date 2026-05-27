@@ -1,4 +1,4 @@
-import { db, eq } from "@repo/database";
+import { and, db, eq } from "@repo/database";
 import { usersTable } from "@repo/database/models/user";
 import {
   createUserWithEmailAndPassword,
@@ -7,6 +7,8 @@ import {
   generateUserToken,
   type SignInUserWithEmailAndPasswordType,
   signInUserWithEmailAndPassword,
+  type SignInOrCreateWithOAuthType,
+  signInOrCreateWithOAuth,
 } from "./model";
 import JWT from "jsonwebtoken";
 import bcrypt from "bcryptjs";
@@ -15,6 +17,16 @@ import { env } from "../env";
 export default class UserService {
   private async getUserByEmail(email: string) {
     const result = await db.select().from(usersTable).where(eq(usersTable.email, email));
+    if (!result || result.length === 0) return null;
+    return result[0];
+  }
+
+  private async getUserByProvider(provider: string, providerId: string) {
+    const result = await db
+      .select()
+      .from(usersTable)
+      .where(and(eq(usersTable.provider, provider), eq(usersTable.providerId, providerId)));
+
     if (!result || result.length === 0) return null;
     return result[0];
   }
@@ -42,6 +54,8 @@ export default class UserService {
         fullName,
         email,
         passwordHash,
+        provider: "password",
+        providerId: email,
       })
       .returning({ id: usersTable.id });
 
@@ -54,6 +68,68 @@ export default class UserService {
       id: result[0].id,
       token,
     };
+  }
+
+  public async signInOrCreateWithOAuth(payload: SignInOrCreateWithOAuthType) {
+    const { provider, providerId, email, fullName } =
+      await signInOrCreateWithOAuth.parseAsync(payload);
+
+    const existingOAuthUser = await this.getUserByProvider(provider, providerId);
+
+    if (existingOAuthUser) {
+      const token = await this.generateUserToken({ id: existingOAuthUser.id });
+      return { id: existingOAuthUser.id, token };
+    }
+
+    const existingEmailUser = await this.getUserByEmail(email);
+
+    if (existingEmailUser) {
+      if (existingEmailUser.provider === "password" && existingEmailUser.passwordHash) {
+        throw new Error("An account with this email already exists. Sign in with your password.");
+      }
+
+      if (
+        existingEmailUser.provider &&
+        (existingEmailUser.provider !== provider ||
+          existingEmailUser.providerId !== providerId)
+      ) {
+        throw new Error("This email is linked to a different sign-in method.");
+      }
+
+      const [updatedUser] = await db
+        .update(usersTable)
+        .set({
+          provider,
+          providerId,
+          fullName: existingEmailUser.fullName || fullName,
+        })
+        .where(eq(usersTable.id, existingEmailUser.id))
+        .returning({ id: usersTable.id });
+
+      if (!updatedUser?.id) {
+        throw new Error("Something went wrong while linking your account");
+      }
+
+      const token = await this.generateUserToken({ id: updatedUser.id });
+      return { id: updatedUser.id, token };
+    }
+
+    const result = await db
+      .insert(usersTable)
+      .values({
+        fullName,
+        email,
+        provider,
+        providerId,
+      })
+      .returning({ id: usersTable.id });
+
+    if (!result[0]?.id) {
+      throw new Error("Something went wrong while creating the user");
+    }
+
+    const token = await this.generateUserToken({ id: result[0].id });
+    return { id: result[0].id, token };
   }
 
   public async signInUserWithEmailAndPassword(payload: SignInUserWithEmailAndPasswordType) {

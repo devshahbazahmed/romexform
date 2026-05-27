@@ -6,10 +6,21 @@ import { Eye, EyeOff, ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useSignin } from "~/hooks/api/user";
+import { useOAuthSignIn } from "~/hooks/api/oauth";
 
-export default function SignupPage() {
+export default function SigninPage() {
   const router = useRouter();
+  const [oauthError, setOauthError] = React.useState<string | null>(null);
   const { signInUserWithEmailAndPasswordAsync, isPending, isSuccess, error } = useSignin();
+  const { signInWithGoogle, signInWithGithub } = useOAuthSignIn();
+
+  React.useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const errorMessage = params.get("error");
+    if (errorMessage) {
+      setOauthError(errorMessage);
+    }
+  }, []);
 
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -101,6 +112,7 @@ export default function SignupPage() {
             <p className="text-xs text-slate-500">Min. 8 characters with 1 symbol.</p>
           </div>
 
+          {oauthError ? <p className="text-sm text-red-400">{oauthError}</p> : null}
           {error ? <p className="text-sm text-red-400">{error.message}</p> : null}
           {isSuccess ? <p className="text-sm text-emerald-400">Account logged in.</p> : null}
 
@@ -127,6 +139,7 @@ export default function SignupPage() {
         <div className="grid grid-cols-2 gap-4">
           <button
             type="button"
+            onClick={signInWithGoogle}
             className="h-11 rounded-lg border border-white/10 bg-transparent text-sm text-white hover:bg-white/5 transition hover:cursor-pointer active:scale-95 hover:scale-110 flex items-center justify-center gap-2"
           >
             <Image src={"/google.png"} alt="Google" width={20} height={20} />
@@ -135,6 +148,7 @@ export default function SignupPage() {
 
           <button
             type="button"
+            onClick={signInWithGithub}
             className="h-11 rounded-lg border border-white/10 bg-transparent text-sm text-white hover:bg-white/5 transition hover:cursor-pointer active:scale-95 hover:scale-110 flex items-center justify-center gap-2"
           >
             <Image src={"/github.png"} alt="Github" width={20} height={20} />
@@ -146,7 +160,7 @@ export default function SignupPage() {
           Dont&apos;t have an account?{" "}
           <button
             className="font-medium text-white hover:text-[#7a6dff] transition"
-            onClick={() => router.push("/signin")}
+            onClick={() => router.push("/signup")}
           >
             Create Account
           </button>

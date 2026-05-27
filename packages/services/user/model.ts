@@ -24,3 +24,14 @@ export const generateUserToken = z.object({
 });
 
 export type GenerateUserTokenType = z.infer<typeof generateUserToken>;
+
+export const oauthProvider = z.enum(["google", "github"]);
+
+export const signInOrCreateWithOAuth = z.object({
+  provider: oauthProvider,
+  providerId: z.string().min(1),
+  email: z.email().max(255),
+  fullName: z.string().min(1).max(100),
+});
+
+export type SignInOrCreateWithOAuthType = z.infer<typeof signInOrCreateWithOAuth>;

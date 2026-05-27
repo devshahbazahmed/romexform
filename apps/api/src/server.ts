@@ -10,6 +10,7 @@ import { serverRouter, createContext } from "@repo/trpc/server";
 
 import { env } from "./env";
 import cookieParser from "cookie-parser";
+import { registerOAuthRoutes } from "./routes/oauth";
 
 export const app = express();
 const openApiDocument = generateOpenApiDocument(serverRouter, {
@@ -27,6 +28,8 @@ app.use(
 
 app.use(cookieParser());
 app.use(express.json());
+
+registerOAuthRoutes(app);
 
 app.get("/", (req, res) => {
   return res.json({ message: "RomexForm is up and running..." });
