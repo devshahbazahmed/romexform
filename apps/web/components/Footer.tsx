@@ -20,7 +20,7 @@ export default function Footer() {
 
         <Link
           href="/contact"
-          className="text-sm font-medium text-white transition-colors hover:text-[#7a6dff]"
+          className="text-sm font-medium text-white transition-colors hover:text-blue-800"
         >
           Contact
         </Link>

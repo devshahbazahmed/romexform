@@ -36,6 +36,20 @@
       "when": 1779900600000,
       "tag": "0004_provider_identity_not_null",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1779882740867,
+      "tag": "0005_thankful_champions",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1780000000000,
+      "tag": "0006_create_form_fields",
+      "breakpoints": true
     }
   ]
 }

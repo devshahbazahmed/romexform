@@ -20,16 +20,16 @@ export default function Header() {
       </Link>
       <div className="hidden sm:flex items-center justify-center gap-8 md:gap-12 mx-4 md:mx-8">
         <Link
-          href={"/"}
+          href={"/dashboard/forms"}
           className="text-xs sm:text-sm md:text-base hover:text-blue-500 hover:scale-110 transition-all duration-300"
         >
           Dashboard
         </Link>
         <Link
-          href={"/"}
+          href={"/pricing"}
           className="text-xs sm:text-sm md:text-base hover:text-blue-500 hover:scale-110 transition-all duration-300"
         >
-          Templates
+          Pricing
         </Link>
         <Link
           href={"/"}

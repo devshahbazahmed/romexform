@@ -3,6 +3,8 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight, CheckCircle2, BarChart3, LayoutTemplate, Sparkles } from "lucide-react";
+import FooterColumn from "~/components/FooterColumn";
+import { FeatureCard } from "~/components/FeatureCard";
 
 // const companies = ["Velocis", "Aether", "Luminary", "Stratos", "CloudBase"];
 
@@ -43,7 +45,7 @@ export default function HomePage() {
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               href="/signup"
-              className="rounded-xl bg-[#6d5dfc] px-7 py-4 font-medium shadow-xl shadow-[#6d5dfc]/20 hover:bg-[#7a6dff] transition"
+              className="rounded-xl bg-blue-600 px-7 py-4 font-medium shadow-xl shadow-[#6d5dfc]/20 hover:bg-blue-800 transition"
             >
               Start building
             </Link>
@@ -136,7 +138,7 @@ export default function HomePage() {
               "ISO-27001 Certified Infrastructure",
             ].map((item) => (
               <div key={item} className="flex items-center gap-3">
-                <CheckCircle2 className="text-[#7a6dff]" size={18} />
+                <CheckCircle2 className="text-blue-600" size={18} />
                 <span>{item}</span>
               </div>
             ))}
@@ -163,7 +165,7 @@ export default function HomePage() {
 
           <Link
             href="/signup"
-            className="mt-10 inline-flex items-center gap-2 rounded-xl bg-[#7a6dff] px-8 py-4 font-medium hover:bg-[#8b80ff] transition"
+            className="mt-10 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-8 py-4 font-medium hover:bg-blue-800 transition"
           >
             Get Started for Free
             <ArrowRight size={18} />
@@ -194,47 +196,5 @@ export default function HomePage() {
         </div>
       </footer>
     </main>
-  );
-}
-
-function FeatureCard({
-  title,
-  description,
-  icon,
-  children,
-}: {
-  title: string;
-  description: string;
-  icon: React.ReactNode;
-  children?: React.ReactNode;
-}) {
-  return (
-    <motion.div
-      whileHover={{ y: -6 }}
-      transition={{ duration: 0.2 }}
-      className="rounded-3xl border border-white/10 bg-white/[0.02] p-8 backdrop-blur-sm"
-    >
-      <div className="mb-6 inline-flex rounded-xl bg-white/5 p-3 text-[#7a6dff]">{icon}</div>
-
-      <h3 className="text-2xl font-semibold">{title}</h3>
-
-      <p className="mt-4 leading-8 text-slate-400">{description}</p>
-
-      {children}
-    </motion.div>
-  );
-}
-
-function FooterColumn({ title, items }: { title: string; items: string[] }) {
-  return (
-    <div>
-      <h4 className="font-semibold">{title}</h4>
-
-      <div className="mt-4 space-y-3 text-sm text-slate-400">
-        {items.map((item) => (
-          <p key={item}>{item}</p>
-        ))}
-      </div>
-    </div>
   );
 }
