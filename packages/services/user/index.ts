@@ -83,6 +83,21 @@ export default class UserService {
     };
   }
 
+  public async getUserInfoById(id: string) {
+    const user = await db
+      .select({
+        id: usersTable.id,
+        fullName: usersTable.fullName,
+        email: usersTable.email,
+      })
+      .from(usersTable)
+      .where(eq(usersTable.id, id));
+
+    if (!user || user.length === 0) throw new Error("User with this ID does not exists");
+
+    return user[0]!;
+  }
+
   public async verifyUserToken(token: string) {
     try {
       const payload = (await JWT.verify(token, env.JWT_SECRET)) as GenerateUserTokenType;

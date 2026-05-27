@@ -22,3 +22,15 @@ export const signInUserWithEmailAndPasswordInput = z.object({
 export const signInUserWithEmailAndPasswordOutput = z.object({
   id: z.string().describe("ID of the user"),
 });
+
+export const getLoggedInUserInfoInput = z.undefined();
+
+export const getLoggedInUserInfoOutput = z.object({
+  id: z.string().describe("ID of the user"),
+  fullName: z
+    .string()
+    .min(3, "Name should be atleast 3 characters")
+    .max(100, "Maximum name length exceeded")
+    .describe("Full name of the user"),
+  email: z.email().max(255, "Maximumm length of email exceeded").describe("Email of the user"),
+});
