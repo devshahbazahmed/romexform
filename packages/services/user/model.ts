@@ -12,6 +12,13 @@ export const createUserWithEmailAndPassword = z.object({
 
 export type CreateUserWithEmailAndPasswordType = z.infer<typeof createUserWithEmailAndPassword>;
 
+export const signInUserWithEmailAndPassword = z.object({
+  email: z.email().max(255, "Maximumm length of email exceeded").describe("Email of the user"),
+  password: z.string().describe("Password hash of the user"),
+});
+
+export type SignInUserWithEmailAndPasswordType = z.infer<typeof signInUserWithEmailAndPassword>;
+
 export const generateUserToken = z.object({
   id: z.string().describe("ID of the user"),
 });

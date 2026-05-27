@@ -1,7 +1,12 @@
 import { userService } from "../../services";
 import { publicProcedure, router } from "../../trpc";
 import { generatePath } from "../../utils/path-generator";
-import { createUserWithEmailAndPasswordInput, createUserWithEmailAndPasswordOutput } from "./model";
+import {
+  createUserWithEmailAndPasswordInput,
+  createUserWithEmailAndPasswordOutput,
+  signInUserWithEmailAndPasswordInput,
+  signInUserWithEmailAndPasswordOutput,
+} from "./model";
 
 const getPath = generatePath("/authentication");
 const TAGS = ["Authentication"];
@@ -33,6 +38,30 @@ export const authRouter = router({
         maxAge: 30 * 24 * 60 * 60 * 1000,
       });
 
+      return {
+        id,
+      };
+    }),
+
+  signInUserWithEmailAndPassword: publicProcedure
+    .meta({
+      openapi: {
+        method: "POST",
+        path: getPath("/signInUserWithEmailAndPassword"),
+        tags: TAGS,
+      },
+    })
+    .input(signInUserWithEmailAndPasswordInput)
+    .output(signInUserWithEmailAndPasswordOutput)
+    .mutation(async ({ input, ctx }) => {
+      const { email, password } = input;
+      const { id, token } = await userService.signInUserWithEmailAndPassword({ email, password });
+      ctx.setCookie("token", token, {
+        httpOnly: true,
+        secure: false,
+        sameSite: "strict",
+        maxAge: 30 * 24 * 60 * 60 * 1000,
+      });
       return {
         id,
       };
