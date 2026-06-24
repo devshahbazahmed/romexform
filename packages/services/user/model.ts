@@ -1,37 +1,11 @@
 import { z } from "zod";
 
-export const createUserWithEmailAndPassword = z.object({
-  fullName: z
-    .string()
-    .min(3, "Name should be atleast 3 characters")
-    .max(100, "Maximum name length exceeded")
-    .describe("Full name of the user"),
-  email: z.email().max(255, "Maximumm length of email exceeded").describe("Email of the user"),
-  password: z.string().describe("Password hash of the user"),
+export const getAuthenticationMethodOutputSchema = z.object({
+  provider: z.enum(["GOOGLE_OAUTH"]),
+  displayName: z.string().optional(),
+  displayText: z.string().optional(),
+  authUrl: z.string(),
 });
-
-export type CreateUserWithEmailAndPasswordType = z.infer<typeof createUserWithEmailAndPassword>;
-
-export const signInUserWithEmailAndPassword = z.object({
-  email: z.email().max(255, "Maximumm length of email exceeded").describe("Email of the user"),
-  password: z.string().describe("Password hash of the user"),
-});
-
-export type SignInUserWithEmailAndPasswordType = z.infer<typeof signInUserWithEmailAndPassword>;
-
-export const generateUserToken = z.object({
-  id: z.string().describe("ID of the user"),
-});
-
-export type GenerateUserTokenType = z.infer<typeof generateUserToken>;
-
-export const oauthProvider = z.enum(["google", "github"]);
-
-export const signInOrCreateWithOAuth = z.object({
-  provider: oauthProvider,
-  providerId: z.string().min(1),
-  email: z.email().max(255),
-  fullName: z.string().min(1).max(100),
-});
-
-export type SignInOrCreateWithOAuthType = z.infer<typeof signInOrCreateWithOAuth>;
+export type GetAuthenticationMethodOutputSchema = z.infer<
+  typeof getAuthenticationMethodOutputSchema
+>;

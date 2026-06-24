@@ -5,57 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1779818298752,
-      "tag": "0000_silent_katie_power",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1779858971927,
-      "tag": "0001_organic_firelord",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1779859263878,
-      "tag": "0002_damp_microchip",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1779900000000,
-      "tag": "0003_oauth_providers",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1779900600000,
-      "tag": "0004_provider_identity_not_null",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1779882740867,
-      "tag": "0005_thankful_champions",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1780000000000,
-      "tag": "0006_create_form_fields",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "7",
-      "when": 1779889678669,
-      "tag": "0007_cuddly_hedge_knight",
+      "when": 1767592965691,
+      "tag": "0000_dusty_morg",
       "breakpoints": true
     }
   ]

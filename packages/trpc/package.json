@@ -2,12 +2,11 @@
   "name": "@repo/trpc",
   "version": "1.0.0",
   "private": true,
-  "exports": {
-    "./server": "./dist/server/index.js",
-    "./client": "./dist/client/index.js"
-  },
-  "scripts": {
-    "build": "tsup server/index.ts client/index.ts --format cjs"
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "dotenv-cli": "^11.0.0",
+    "typescript": "^5.9.3"
   },
   "dependencies": {
     "@repo/services": "workspace:*",
@@ -15,13 +14,5 @@
     "@trpc/server": "^11.8.1",
     "trpc-to-openapi": "^3.1.0",
     "zod": "^4.3.5"
-  },
-  "devDependencies": {
-    "@repo/eslint-config": "workspace:*",
-    "@repo/typescript-config": "workspace:*",
-    "@types/express": "^5.0.6",
-    "dotenv-cli": "^11.0.0",
-    "tsup": "^8.5.1",
-    "typescript": "^5.9.3"
   }
 }

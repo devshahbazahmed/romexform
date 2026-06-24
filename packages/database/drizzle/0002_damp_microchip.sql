@@ -1,1 +1,0 @@
-ALTER TABLE "forms" ALTER COLUMN "description" SET DATA TYPE varchar(300);
